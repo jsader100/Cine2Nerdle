@@ -1,6 +1,6 @@
 import requests
 
-file_path = 'Authorization_Token.gitignore'
+file_path = 'Auth_Token'
 with open(file_path, 'r') as file:
     token = file.read()
 
