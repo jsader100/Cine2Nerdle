@@ -10,10 +10,6 @@ headers = {
     "Authorization": "Bearer " + token
 }
 
-
-
-
-
 def prompt_movie():
     done = False
 
@@ -67,7 +63,7 @@ def print_cast_movies(pid):
     response = requests.get(url, headers=headers)
     results = response.json()
 
-    for i in range(5):
+    for i in range(3):
         print_movie(results['cast'][i]['id'])
 
 def print_movie(id):
@@ -86,9 +82,18 @@ def get_cast_movies(pid):
 
     response = requests.get(url, headers=headers)
     results = response.json()
+    print(results)
+    print(len(results['cast']))
 
-    for i in range(5):
-        return_list.append(get_movie(results['cast'][i]['id']))
+    i=0
+    while i < min(5, len(results['cast'])):
+        movie = results['cast'][i]
+
+        if movie['media_type'] == 'movie':
+            print(movie['id'])
+            return_list.append(get_movie(movie['id']))
+
+        i+=1
 
     return return_list
 def get_connected_movies(id):
@@ -115,3 +120,4 @@ def get_movie(id):
 
     return results['title'] + " (" + results['release_date'][:4] + ")"
 
+print(get_cast_movies(1945702))

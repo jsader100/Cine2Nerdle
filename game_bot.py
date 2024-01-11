@@ -1,3 +1,5 @@
+import csv
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -9,6 +11,9 @@ from datetime import datetime
 import random
 
 import time
+
+
+tracking_data = [['Movie Recieved', 'Movie Played', 'Time to respond']]
 
 def play_game():
 
@@ -60,6 +65,8 @@ def main_game(driver):
 
     while not game_end:
 
+        start_time = time.time()
+
         WebDriverWait(driver, 60).until(
             EC.presence_of_element_located((By.CLASS_NAME, "battle-input"))
         )
@@ -70,23 +77,35 @@ def main_game(driver):
         time.sleep(2)
 
         last_played_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+        if len(last_played_movie.text) !=0:
+            print(last_played_movie.text)
+            movie_title = last_played_movie.text.split()
+            print(movie_title)
+            movie_year = str(movie_title[-1][1:-1])
+            movie_title = " ".join(movie_title[2:-1])
 
+            move_id = get_movie_id(movie_title, movie_year)
+            movie_list = get_connected_movies(move_id)
 
-        print(last_played_movie.text)
-        movie_title = last_played_movie.text.split()
-        print(movie_title)
-        movie_year = str(movie_title[-1][1:-1])
-        movie_title = " ".join(movie_title[2:-1])
+            movie_to_play = movie_list[random.randint(0, 2)][random.randint(0,2)]
+            end_time = time.time()
 
-        move_id = get_movie_id(movie_title, movie_year)
-        movie_list = get_connected_movies(move_id)
+            total_time = end_time - start_time
 
-        input_element.send_keys(movie_list[random.randint(0, 3)][random.randint(0,4)])
-        link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+            export_data = [movie_title, movie_to_play, total_time]
+            tracking_data.append(export_data)
 
-        link.click()
+            with open('game_data.csv', mode='w', newline='') as csv_file:
+                csv_writer = csv.writer(csv_file)
 
-        time.sleep(1)
+                csv_writer.writerows(tracking_data)
+
+            input_element.send_keys(movie_to_play)
+            link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+
+            link.click()
+
+            time.sleep(1)
 
 
 
