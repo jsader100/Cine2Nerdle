@@ -115,6 +115,3 @@ def get_movie(id):
 
     return results['title'] + " (" + results['release_date'][:4] + ")"
 
-#print(get_connected_movies(238))
-
-print(get_movie_id("The Godfather", 1972))

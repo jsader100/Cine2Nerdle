@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from tmdb_scrape import *
+from tmdb_scrape import get_connected_movies, get_movie_id
 from datetime import datetime
 import random
 
@@ -44,6 +44,7 @@ def add_bans(driver):
     input_element[1].send_keys("Martin Scorsese" + Keys.ENTER)
     input_element[2].send_keys("Leonardo DiCaprio" + Keys.ENTER)
 
+    driver.execute_script("window.scrollBy(0, 250);")
     time.sleep(3)
 
     link = driver.find_element(By.CLASS_NAME, "battle-choose-bans-button")
@@ -91,21 +92,3 @@ def main_game(driver):
 
 play_game()
 
-
-
-'''WebDriverWait(driver, 5).until(
-    EC.presence_of_element_located((By.CLASS_NAME, "gLFyf"))
-)
-
-input_element = driver.find_element(By.CLASS_NAME, "gLFyf")
-input_element.clear()
-input_element.send_keys("tech with tim" + Keys.ENTER)
-
-link = driver.find_element(By.PARTIAL_LINK_TEXT, "Tech With Tim")
-
-link.click()
-
-time.sleep(5)
-
-driver.quit()
-'''
