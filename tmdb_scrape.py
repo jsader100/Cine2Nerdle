@@ -30,8 +30,6 @@ def prompt_movie():
 
 def get_movie_id(movie, year):
 
-    start_time = time.time()
-
 #Checking at three different page numbers each iteration through. Top will look at the top of the list,
 #while mid and bottom look at chunks in the middle. 500 is the max pages per year. Movies played are heavily
 #skewed towards the top of the list which is why the increments for get larger from top-bottom.
@@ -52,8 +50,7 @@ def get_movie_id(movie, year):
             for i in range(20):
                 if results['results'][i]['title'] == movie:
                     end_time = time.time()
-                    print(f"get_movie_id time = {round(end_time-start_time, 2)}")
-                    return results['results'][j]['id']
+                    return results['results'][i]['id']
 
         if mid < 251:
             url = f'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page={mid}&primary_release_year={year}&sort_by=popularity.desc'
@@ -65,7 +62,6 @@ def get_movie_id(movie, year):
             for j in range(20):
                 if results['results'][j]['title'] == movie:
                     end_time = time.time()
-                    print(f"get_movie_id time = {round(end_time - start_time, 2)}")
                     return results['results'][j]['id']
 
         if bottom < 501:
@@ -75,11 +71,10 @@ def get_movie_id(movie, year):
             results = response.json()
 
 
-            for k in range(20):
+            for k in range(len(results['results'])):
                 if results['results'][k]['title'] == movie:
                     end_time = time.time()
-                    print(f"get_movie_id time = {round(end_time - start_time, 2)}")
-                    return results['results'][j]['id']
+                    return results['results'][k]['id']
 
         top += 1
         mid += 1
@@ -130,7 +125,6 @@ def get_cast_movies(pid):
         movie = results['cast'][i]
 
         if movie['media_type'] == 'movie':
-            print(movie['id'])
             return_list.append(get_movie(movie['id']))
 
         i+=1

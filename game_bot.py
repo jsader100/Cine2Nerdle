@@ -33,8 +33,6 @@ def play_game():
 
     add_bans(driver)
 
-    time.sleep(20)
-
     main_game(driver)
 
     driver.quit()
@@ -50,7 +48,7 @@ def add_bans(driver):
     input_element[2].send_keys("Leonardo DiCaprio" + Keys.ENTER)
 
     driver.execute_script("window.scrollBy(0, 250);")
-    time.sleep(3)
+    time.sleep(1)
 
     link = driver.find_element(By.CLASS_NAME, "battle-choose-bans-button")
 
@@ -60,36 +58,51 @@ def add_bans(driver):
 def main_game(driver):
 
     game_end = False
+    input_element = None
 
+#Waits to find the battle board before starting the game
+    WebDriverWait(driver, 90).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "battle-board-movie"))
 
+    )
 
     while not game_end:
 
         start_time = time.time()
 
-        WebDriverWait(driver, 60).until(
+        WebDriverWait(driver, 90).until(
             EC.presence_of_element_located((By.CLASS_NAME, "battle-input"))
+
         )
 
 
         input_element = driver.find_element(By.CLASS_NAME, "battle-input")
 
-        time.sleep(2)
+        time.sleep(0.5)
 
-        last_played_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
-        if len(last_played_movie.text) !=0:
-            print(last_played_movie.text)
-            movie_title = last_played_movie.text.split()
+        input_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+        print(input_movie.text)
+        if len(input_movie.text) !=0:
+
+            print(input_movie.text)
+            movie_title = input_movie.text.split()
             print(movie_title)
             movie_year = str(movie_title[-1][1:-1])
             movie_title = " ".join(movie_title[2:-1])
 
             move_id = get_movie_id(movie_title, movie_year)
+
             movie_list = get_connected_movies(move_id)
 
-            movie_to_play = movie_list[random.randint(0, 2)][random.randint(0,2)]
-            end_time = time.time()
 
+            movie_to_play = movie_list[random.randint(0, 2)][random.randint(0,2)]
+            time.sleep(1)
+            last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+            input_element.send_keys(movie_to_play)
+            link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+
+            link.click()
+            end_time = time.time()
             total_time = end_time - start_time
 
             export_data = [movie_title, movie_to_play, total_time]
@@ -100,10 +113,7 @@ def main_game(driver):
 
                 csv_writer.writerows(tracking_data)
 
-            input_element.send_keys(movie_to_play)
-            link = driver.find_element(By.CLASS_NAME, "fa-sharp")
 
-            link.click()
 
             time.sleep(1)
 
