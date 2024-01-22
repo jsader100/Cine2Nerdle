@@ -73,41 +73,49 @@ def main_game(driver):
         input_element = driver.find_element(By.CLASS_NAME, "battle-input")
 
         time.sleep(0.5)
-
         input_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
-        print(input_movie.text)
-        if len(input_movie.text) != 0:
-            start_time = time.time()
 
-            movie_title = input_movie.text.split()
+        while len(input_movie.text) == 0:
+            print("No movie found...")
+            time.sleep(2)
+            input_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
 
-            movie_year = str(movie_title[-1][1:-1])
-            movie_title = " ".join(movie_title[2:-1])
+        start_time = time.time()
 
-            move_id = get_movie_id(movie_title, movie_year)
+        movie_title = input_movie.text.split()
+        print(movie_title)
+        movie_year = str(movie_title[-1][1:-1])
+        movie_title = " ".join(movie_title[2:-1])
 
-            movie_list = get_connected_movies(move_id)
+        print(movie_title)
 
-            movie_to_play = movie_list[random.randint(0, 2)][random.randint(0, 2)]
-            time.sleep(1)
-            last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
-            input_element.clear()
-            input_element.send_keys(movie_to_play)
-            link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+        movie_id = get_movie_id(movie_title, movie_year)
+        print(movie_id)
 
-            link.click()
-            end_time = time.time()
-            total_time = end_time - start_time
 
-            export_data = [movie_title, movie_to_play, total_time]
-            tracking_data.append(export_data)
+        movie_list = get_connected_movies(movie_id)
+        print("Movie list found.")
 
-            with open('game_data.csv', mode='w', newline='') as csv_file:
-                csv_writer = csv.writer(csv_file)
+        movie_to_play = movie_list[random.randint(0, 2)][random.randint(0, 2)]
+        time.sleep(1)
+        last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+        input_element.clear()
+        input_element.send_keys(movie_to_play)
+        link = driver.find_element(By.CLASS_NAME, "fa-sharp")
 
-                csv_writer.writerows(tracking_data)
+        link.click()
+        end_time = time.time()
+        total_time = end_time - start_time
 
-            time.sleep(1)
+        export_data = [movie_title, movie_to_play, total_time]
+        tracking_data.append(export_data)
+
+        with open('game_data.csv', mode='w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+
+            csv_writer.writerows(tracking_data)
+
+        time.sleep(1)
 
 
 play_game()

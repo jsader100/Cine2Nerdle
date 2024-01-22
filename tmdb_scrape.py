@@ -141,8 +141,9 @@ def get_connected_movies(id):
     results = response.json()
 
     i = 0
-    while i < 5 or i < len(get_cast_movies(results['cast'])):
+    while i < min(5, len(results['cast'])):
         return_list.append(get_cast_movies(results['cast'][i]['id']))
+        i+= 1
 
     return return_list
 
@@ -154,3 +155,5 @@ def get_movie(id):
     results = response.json()
 
     return results['title'] + " (" + results['release_date'][:4] + ")"
+
+
