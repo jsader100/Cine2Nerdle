@@ -69,19 +69,26 @@ def play_movie(input_element, input_movie, driver):
     movie_list = get_connected_movies(movie_id)
     print("Movie list found.")
 
-    movie_to_play = movie_list[random.randint(0, 2)][random.randint(0, 2)]
-    time.sleep(1)
-    last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
-    input_element.clear()
-    input_element.send_keys(movie_to_play)
-    link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+    movie_played = False
+    while not movie_played:
+        movie_to_play = movie_list[random.randint(0, 2)][random.randint(0, 2)]
+        time.sleep(1)
+        last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+        input_element.send_keys(movie_to_play)
+        link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+        link.click()
+        time.sleep(1)
+        last_movie_played = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+        if last_movie_played != input_movie:
+            movie_played = True
 
-    link.click()
+
     end_time = time.time()
     total_time = end_time - start_time
 
     export_data = [movie_title, movie_to_play, total_time]
     tracking_data.append(export_data)
+
 def main_game(driver):
     game_end = False
     input_element = None
