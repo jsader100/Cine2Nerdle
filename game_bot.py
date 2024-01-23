@@ -14,6 +14,9 @@ import time
 
 tracking_data = [['Movie Recieved', 'Movie Played', 'Time to respond']]
 
+played_movies = set()
+played_cast = {}
+
 
 def play_game():
     service = Service(executable_path="/Users/johnsader/PycharmProjects/Cine2Nerdle/chromedriver")
@@ -30,14 +33,14 @@ def play_game():
 
     time.sleep(3)
 
-    add_bans(driver)
+    pre_game(driver)
 
     main_game(driver)
 
     driver.quit()
 
 
-def add_bans(driver):
+def pre_game(driver):
     time.sleep(3)
 
     input_element = driver.find_elements(By.CLASS_NAME, "battle-input")
@@ -52,6 +55,22 @@ def add_bans(driver):
 
     link.click()
 
+    # Waits to find the battle board before starting the game
+    WebDriverWait(driver, 90).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "battle-board-movie"))
+    )
+
+    time.sleep(5)
+
+    first_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+    movie_title = first_movie.text.split()
+    print(movie_title)
+    movie_year = str(movie_title[-1][1:-1])
+    movie_title = " ".join(movie_title[2:-1])
+
+    played_movies.add(first_movie)
+
+
 def play_movie(input_element, input_movie, driver):
 
     start_time = time.time()
@@ -61,6 +80,7 @@ def play_movie(input_element, input_movie, driver):
     movie_year = str(movie_title[-1][1:-1])
     movie_title = " ".join(movie_title[2:-1])
 
+    played_movies.add(movie_title)
     print(movie_title)
 
     movie_id = get_movie_id(movie_title, movie_year)
@@ -71,20 +91,34 @@ def play_movie(input_element, input_movie, driver):
 
     movie_played = False
     while not movie_played:
-        movie_to_play = movie_list[random.randint(0, 2)][random.randint(0, 2)]
-        time.sleep(1)
-        last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
-        input_element.send_keys(movie_to_play)
-        link = driver.find_element(By.CLASS_NAME, "fa-sharp")
-        link.click()
-        time.sleep(1)
-        last_movie_played = driver.find_element(By.CLASS_NAME, "battle-board-movie")
-        if last_movie_played != input_movie:
-            movie_played = True
+
+        #Pick a random cast member from the movie list
+        rand_cast_num = random.randint(0, len(movie_list)-1)
+        #Pick a random movie from selected cast member
+        rand_movie_num = random.randint(0, len(movie_list[rand_cast_num])-1)
+
+        #Gets and plays movie
+        movie_to_play = movie_list[rand_cast_num][rand_movie_num]
+
+        if movie_to_play not in played_movies:
+            time.sleep(1)
+            last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+            input_element.send_keys(movie_to_play)
+            link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+            link.click()
+            time.sleep(1)
+
+            #Makes sure that selected movie was successfully played before moving on
+            last_movie_played = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+
+            if last_movie_played != input_movie:
+                movie_played = True
 
 
     end_time = time.time()
     total_time = end_time - start_time
+
+    played_movies.add(movie_to_play)
 
     export_data = [movie_title, movie_to_play, total_time]
     tracking_data.append(export_data)
@@ -92,12 +126,6 @@ def play_movie(input_element, input_movie, driver):
 def main_game(driver):
     game_end = False
     input_element = None
-
-    # Waits to find the battle board before starting the game
-    WebDriverWait(driver, 90).until(
-        EC.presence_of_element_located((By.CLASS_NAME, "battle-board-movie"))
-
-    )
 
     while not game_end:
 
