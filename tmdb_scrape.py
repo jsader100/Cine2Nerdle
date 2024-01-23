@@ -34,7 +34,6 @@ def get_movie_id(movie, year):
     # while mid and bottom look at chunks in the middle. 500 is the max pages per year. Movies played are heavily
     # skewed towards the top of the list which is why the increments for get larger from top-bottom.
     # The max iterations is 250 which seems to take about 20s as is. Pretty unlikely to run out of time.
-
     top = 1
     mid = 16
     bottom = 250

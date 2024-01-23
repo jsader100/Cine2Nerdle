@@ -52,7 +52,36 @@ def add_bans(driver):
 
     link.click()
 
+def play_movie(input_element, input_movie, driver):
 
+    start_time = time.time()
+
+    movie_title = input_movie.text.split()
+    print(movie_title)
+    movie_year = str(movie_title[-1][1:-1])
+    movie_title = " ".join(movie_title[2:-1])
+
+    print(movie_title)
+
+    movie_id = get_movie_id(movie_title, movie_year)
+    print(movie_id)
+
+    movie_list = get_connected_movies(movie_id)
+    print("Movie list found.")
+
+    movie_to_play = movie_list[random.randint(0, 2)][random.randint(0, 2)]
+    time.sleep(1)
+    last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
+    input_element.clear()
+    input_element.send_keys(movie_to_play)
+    link = driver.find_element(By.CLASS_NAME, "fa-sharp")
+
+    link.click()
+    end_time = time.time()
+    total_time = end_time - start_time
+
+    export_data = [movie_title, movie_to_play, total_time]
+    tracking_data.append(export_data)
 def main_game(driver):
     game_end = False
     input_element = None
@@ -80,35 +109,7 @@ def main_game(driver):
             time.sleep(2)
             input_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
 
-        start_time = time.time()
-
-        movie_title = input_movie.text.split()
-        print(movie_title)
-        movie_year = str(movie_title[-1][1:-1])
-        movie_title = " ".join(movie_title[2:-1])
-
-        print(movie_title)
-
-        movie_id = get_movie_id(movie_title, movie_year)
-        print(movie_id)
-
-
-        movie_list = get_connected_movies(movie_id)
-        print("Movie list found.")
-
-        movie_to_play = movie_list[random.randint(0, 2)][random.randint(0, 2)]
-        time.sleep(1)
-        last_movie = driver.find_element(By.CLASS_NAME, "battle-board-movie")
-        input_element.clear()
-        input_element.send_keys(movie_to_play)
-        link = driver.find_element(By.CLASS_NAME, "fa-sharp")
-
-        link.click()
-        end_time = time.time()
-        total_time = end_time - start_time
-
-        export_data = [movie_title, movie_to_play, total_time]
-        tracking_data.append(export_data)
+        play_movie(input_element, input_movie, driver)
 
         with open('game_data.csv', mode='w', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
